@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Подписки{% endblock %}
+{% block content %}
+
+<section class="hero" style="padding:28px 32px">
+    <span class="eyebrow">Каталог</span>
+    <h1 style="font-size:28px; margin:12px 0 8px">Выберите подписки</h1>
+    <p style="margin-bottom:0">Отметьте нужные сервисы и оплатите всё одной транзакцией с кошелька.</p>
+</section>
+
+<div class="spacer"></div>
+
+<form method="post" action="/subscriptions/pay-all">
+    <div class="panel">
+        <div class="panel-head">
+            <h2 class="panel-title">Доступные сервисы</h2>
+            <span class="muted small">Отметьте нужные</span>
+        </div>
+
+        <div class="sub-list">
+            {% for s in services %}
+            {% set active = mine.get(s.id) and mine[s.id].is_active %}
+            <label class="sub-row {% if active %}selected{% endif %}" for="chk-{{ s.id }}">
+                <input id="chk-{{ s.id }}" type="checkbox" {% if active %}checked{% endif %} onchange="document.getElementById('toggle-{{ s.id }}').submit()">
+                <span class="icon">{{ s.icon }}</span>
+                <span>
+                    <span class="name">{{ s.name }}</span>
+                    <span class="mode">{{ s.execution_mode.value }}</span>
+                </span>
+                <span class="price">{{ '%.2f'|format(s.price / 100) }} ₽</span>
+            </label>
+            {% endfor %}
+        </div>
+
+        <div class="summary">
+            <div>
+                <div class="total-label">Итого за месяц</div>
+                <div class="total-value" id="total-label">0.00 ₽</div>
+            </div>
+            <div class="actions">
+                <a href="/" class="btn ghost">На главную</a>
+                <button type="submit">Оплатить всё</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% for s in services %}
+<form id="toggle-{{ s.id }}" method="post" action="/subscriptions/toggle" style="display:none">
+    <input type="hidden" name="service_id" value="{{ s.id }}">
+</form>
+{% endfor %}
+
+<script>
+function recalc() {
+    var total = 0;
+    document.querySelectorAll('.sub-row').forEach(function (row) {
+        var chk = row.querySelector('input[type=checkbox]');
+        row.classList.toggle('selected', chk.checked);
+        if (chk.checked) {
+            var priceText = row.querySelector('.price').textContent.replace(/[^\d.,]/g, '').replace(',', '.');
+            total += parseFloat(priceText) || 0;
+        }
+    });
+    document.getElementById('total-label').textContent = total.toFixed(2) + ' ₽';
+}
+document.querySelectorAll('.sub-row input[type=checkbox]').forEach(function (c) {
+    c.addEventListener('change', recalc);
+});
+document.addEventListener('DOMContentLoaded', recalc);
+</script>
+
+{% endblock %}

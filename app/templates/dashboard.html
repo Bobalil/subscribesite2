@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Главная{% endblock %}
+{% block content %}
+
+{% if request.query_params.get('error') == 'funds' %}
+<div class="alert error">Недостаточно средств. Пополните кошелёк.</div>
+{% elif request.query_params.get('error') == 'empty' %}
+<div class="alert error">Выберите хотя бы одну подписку.</div>
+{% elif request.query_params.get('error') == 'amount' %}
+<div class="alert error">Некорректная сумма.</div>
+{% endif %}
+
+<section class="hero">
+    <span class="eyebrow">Добро пожаловать</span>
+    <h1>Привет, {{ user.first_name or user.email }}</h1>
+    <p>Управляйте подписками и оплачивайте их одной транзакцией.</p>
+</section>
+
+<div class="spacer"></div>
+
+<div class="grid-2">
+    <div class="panel" id="topup">
+        <div class="panel-head">
+            <h2 class="panel-title">Баланс кошелька</h2>
+            <span class="pill ok">Активен</span>
+        </div>
+        <div class="balance-value">
+            <!-- Переводим копейки в рубли -->
+            {{ '%.2f'|format(wallet.balance / 100) }} <span class="cur">₽</span>
+        </div>
+        <p class="muted small">Пополните один раз — и оплачивайте любые подписки из баланса.</p>
+        <hr class="divider">
+        <form method="post" action="/wallet/topup" class="row">
+            <div class="field">
+                <label>Сумма пополнения, ₽</label>
+                <input name="amount" type="number" min="1" value="1000" required>
+            </div>
+            <div class="field" style="flex:0 0 auto;">
+                <button type="submit">Пополнить</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="panel">
+        <div class="panel-head">
+            <h2 class="panel-title">Быстрые действия</h2>
+        </div>
+        <div class="stack">
+            <a href="/subscriptions" class="btn block">Перейти к подпискам</a>
+            <a href="/cards" class="btn ghost block">Моя виртуальная карта</a>
+        </div>
+        <hr class="divider">
+        <p class="small muted">Совет: держите на кошельке сумму на 1–2 месяца вперёд.</p>
+    </div>
+</div>
+
+<div class="spacer"></div>
+
+<div class="panel">
+    <div class="panel-head">
+        <h2 class="panel-title">История операций</h2>
+    </div>
+    {% if entries %}
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr><th>Дата</th><th>Тип</th><th>Сумма</th><th>Описание</th></tr>
+            </thead>
+            <tbody>
+                {% for e in entries %}
+                <tr>
+                    <td class="muted small">{{ e.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                    <td><span class="pill">{{ e.entry_type.value }}</span></td>
+                    <td class="{{ 'neg' if e.amount < 0 else 'pos' }}">
+                        {{ '%+.2f'|format(e.amount / 100) }} ₽
+                    </td>
+                    <td>{{ e.description }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="muted">Пока пусто. Пополните кошелёк, чтобы начать.</p>
+    {% endif %}
+</div>
+
+{% endblock %}
