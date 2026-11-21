@@ -14,7 +14,28 @@
 <div class="panel center">
     <p class="muted">У вас ещё нет виртуальной карты.</p>
     <form method="post" action="/cards/issue">
-        <button type="submit">Выпустить карту</button>
+        <button id="issue-btn" type="button">Выпустить карту</button>
+
+<script>
+    document.getElementById('issue-btn').addEventListener('click', async function() {
+        this.disabled = true;
+        this.textContent = 'Выпускаем...';
+        try {
+            const response = await fetch('/cards/issue', { method: 'POST' });
+            if (response.ok) {
+                window.location.reload(); // Перезагружаем страницу, чтобы увидеть карту
+            } else {
+                alert('Ошибка при выпуске карты');
+                this.disabled = false;
+                this.textContent = 'Выпустить карту';
+            }
+        } catch (e) {
+            alert('Ошибка сети');
+            this.disabled = false;
+            this.textContent = 'Выпустить карту';
+        }
+    });
+</script>
     </form>
 </div>
 {% else %}
