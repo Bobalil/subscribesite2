@@ -9,14 +9,13 @@ def issue_card_for_user(db: Session, user_id: int, holder: str) -> Card:
     if existing and existing.status != CardStatus.CLOSED:
         return existing
 
-    # Заглушка (в будущем тут будет вызов API банка)
+    # Создаем карту БЕЗ external_id, так как этого поля нет в модели
     card = Card(
         user_id=user_id,
         pan_masked="**** **** **** 1234",
         exp_month=12,
         exp_year=2030,
         holder=holder.upper(),
-        external_id=f"mock_{user_id}",
         status=CardStatus.ACTIVE,
     )
     db.add(card)
