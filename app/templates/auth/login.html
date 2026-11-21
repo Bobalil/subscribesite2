@@ -10,7 +10,9 @@
         <h2 style="margin-top:0">Вход</h2>
 
         {% if error %}
-        <div class="alert error">{{ error }}</div>
+        <div class="alert error" style="color: #b42318; background: #fdecea; padding: 10px; border-radius: 8px; margin-bottom: 16px;">
+            {{ error }}
+        </div>
         {% endif %}
 
         <form method="post" action="/auth/login-form" class="stack">
