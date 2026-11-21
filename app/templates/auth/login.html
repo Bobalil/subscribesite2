@@ -1,32 +1,31 @@
 {% extends "base.html" %}
 {% block title %}Вход{% endblock %}
 {% block content %}
-<div class="auth-wrap">
-    <div class="auth-promo">
-        <h1>С возвращением</h1>
-        <p>Войдите, чтобы управлять своими подписками.</p>
-    </div>
-    <div class="panel auth-card">
-        <h2 style="margin-top:0">Вход</h2>
+<div class="auth-wrap" style="display: flex; justify-content: center; align-items: center; min-height: 60vh;">
+    <div class="panel" style="max-width: 440px; width: 100%;">
+        <div style="text-align: center; margin-bottom: 24px;">
+            <h2 style="margin-bottom: 8px;">С возвращением</h2>
+            <p class="muted small">Войдите, чтобы управлять подписками</p>
+        </div>
 
         {% if error %}
-        <div class="alert error" style="color: #b42318; background: #fdecea; padding: 10px; border-radius: 8px; margin-bottom: 16px;">
-            {{ error }}
-        </div>
+        <div class="alert error">{{ error }}</div>
         {% endif %}
 
-        <form method="post" action="/auth/login-form" class="stack">
+        <form method="post" action="/auth/login-form">
             <div class="field">
                 <label>Email</label>
-                <input name="email" type="email" required>
+                <input name="email" type="email" required placeholder="name@example.com">
             </div>
             <div class="field">
                 <label>Пароль</label>
                 <input name="password" type="password" required>
             </div>
-            <button type="submit" class="block" style="margin-top:12px">Войти</button>
+            <button type="submit" class="btn block" style="margin-top: 10px;">Войти</button>
         </form>
-        <p class="center small muted" style="margin-top:16px">Нет аккаунта? <a href="/auth/register">Создать</a></p>
+        <p style="text-align: center; margin-top: 20px; font-size: 14px;" class="muted">
+            Нет аккаунта? <a href="/auth/register">Создать</a>
+        </p>
     </div>
 </div>
 {% endblock %}
