@@ -1,6 +1,8 @@
 (function () {
   function formatPhone(raw) {
     let digits = (raw || "").replace(/\D/g, "");
+    if (!digits) return "";
+    
     if (digits.startsWith("8")) digits = "7" + digits.slice(1);
     if (digits.length === 10) digits = "7" + digits;
     if (!digits.startsWith("7")) digits = "7" + digits;
@@ -26,6 +28,9 @@
     });
     input.addEventListener("focus", () => {
       if (!input.value) input.value = "+7";
+    });
+    input.addEventListener("blur", () => {
+      if (input.value === "+7") input.value = "";
     });
   });
 })();
