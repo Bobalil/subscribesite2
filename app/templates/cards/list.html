@@ -2,69 +2,52 @@
 {% block title %}Моя карта{% endblock %}
 {% block content %}
 
-<section class="hero" style="padding:28px 32px">
-    <span class="eyebrow">Виртуальная карта</span>
-    <h1 style="font-size:28px; margin:12px 0 8px">Карта для подписок</h1>
-    <p style="margin-bottom:0">Привяжите эту карту к сервисам, а оплачивайте через кошелёк.</p>
+<section class="hero" style="text-align: left; padding: 0 0 24px 0;">
+    <h1>Виртуальная карта</h1>
+    <p>Привяжите эту карту к сервисам, а оплачивайте через кошелёк.</p>
 </section>
 
-<div class="spacer"></div>
-
 {% if not card %}
-<div class="panel center">
-    <p class="muted">У вас ещё нет виртуальной карты.</p>
-    <form method="post" action="/cards/issue">
-        <button id="issue-btn" type="button">Выпустить карту</button>
-
+<div class="panel" style="text-align: center; padding: 60px 20px;">
+    <p class="muted" style="margin-bottom: 20px;">У вас ещё нет виртуальной карты.</p>
+    <button id="issue-btn" class="btn">Выпустить карту</button>
+</div>
 <script>
     document.getElementById('issue-btn').addEventListener('click', async function() {
         this.disabled = true;
         this.textContent = 'Выпускаем...';
-        try {
-            const response = await fetch('/cards/issue', { method: 'POST' });
-            if (response.ok) {
-                window.location.reload(); // Перезагружаем страницу, чтобы увидеть карту
-            } else {
-                alert('Ошибка при выпуске карты');
-                this.disabled = false;
-                this.textContent = 'Выпустить карту';
-            }
-        } catch (e) {
-            alert('Ошибка сети');
-            this.disabled = false;
-            this.textContent = 'Выпустить карту';
-        }
+        const res = await fetch('/cards/issue', { method: 'POST' });
+        if (res.ok) window.location.reload();
+        else { alert('Ошибка при выпуске карты'); this.disabled = false; this.textContent = 'Выпустить карту'; }
     });
 </script>
-    </form>
-</div>
 {% else %}
 <div class="panel">
     <div class="panel-head">
-        <h2 class="panel-title">Реквизиты карты</h2>
+        <h2 class="panel-title">Ваша карта</h2>
         <span class="pill {{ 'ok' if card.status.value == 'active' else 'bad' }}">{{ card.status.value }}</span>
     </div>
     
-    <div style="background:var(--surface-2); padding:24px; border-radius:12px; max-width:400px; margin:0 auto 20px">
-        <div style="font-size:12px; color:var(--muted); margin-bottom:8px">НОМЕР КАРТЫ</div>
-        <div style="font-size:24px; letter-spacing:2px; font-family:monospace; margin-bottom:20px">{{ card.pan_masked }}</div>
-        
-        <div style="display:flex; justify-content:space-between">
+    <!-- Визуализация карты -->
+    <div class="card-visual">
+        <div class="chip"></div>
+        <div class="number">{{ card.pan_masked }}</div>
+        <div class="bottom">
             <div>
-                <div style="font-size:12px; color:var(--muted); margin-bottom:4px">ДЕРЖАТЕЛЬ</div>
-                <div style="font-weight:600">{{ card.holder }}</div>
+                <div>Держатель</div>
+                <div style="color: var(--text); font-size: 14px; font-weight: 600; margin-top:4px;">{{ card.holder }}</div>
             </div>
             <div>
-                <div style="font-size:12px; color:var(--muted); margin-bottom:4px">СРОК</div>
-                <div style="font-weight:600">{{ "%02d"|format(card.exp_month) }}/{{ card.exp_year }}</div>
+                <div>Срок</div>
+                <div style="color: var(--text); font-size: 14px; font-weight: 600; margin-top:4px;">{{ "%02d"|format(card.exp_month) }}/{{ card.exp_year }}</div>
             </div>
         </div>
     </div>
 
-    <div class="center">
+    <div style="text-align: center;">
         {% if card.status.value == 'active' %}
-        <form method="post" action="/cards/{{ card.id }}/block" style="display:inline">
-            <button type="submit" class="ghost">Заблокировать</button>
+        <form method="post" action="/cards/{{ card.id }}/block">
+            <button type="submit" class="btn ghost">Заблокировать карту</button>
         </form>
         {% endif %}
     </div>
