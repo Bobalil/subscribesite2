@@ -1,4 +1,4 @@
-app = "subscribesite" # Замените на ваше имя приложения на Fly.io
+app = "subscribesite2" # Замените на ваше имя приложения на Fly.io
 primary_region = "ams"
 
 [build]
